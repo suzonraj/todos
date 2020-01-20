@@ -1,7 +1,7 @@
 {
-    "name": "laravel/laravel",
+    "name": "suzonraj/todos",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "To Do Lists Manager",
     "keywords": [
         "framework",
         "laravel"
@@ -11,9 +11,12 @@
         "php": "^7.2",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.2",
-        "laravel/tinker": "^2.0"
+        "laravel/tinker": "^2.0",
+        "predis/predis": "^1.1"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.2",
+        "barryvdh/laravel-ide-helper": "^2.6",
         "facade/ignition": "^1.4",
         "fzaninotto/faker": "^1.4",
         "mockery/mockery": "^1.0",
@@ -49,13 +52,42 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan ide-helper:generate",
+            "@php artisan ide-helper:meta"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "clear-all": [
+            "@php artisan clear-compiled",
+            "@php artisan cache:clear",
+            "@php artisan route:clear",
+            "@php artisan view:clear",
+            "@php artisan config:clear",
+            "composer dumpautoload -o"
+        ],
+        "cache-all": [
+            "@php artisan config:cache",
+            "@php artisan route:cache"
+        ],
+        "phpunit": [
+            "phpunit > output.txt -d memory_limit=2048M"
+        ],
+        "coverage-xml": [
+            "phpunit --coverage-clover ./coverage.xml"
+        ],
+        "coverage-html": [
+            "phpunit --coverage-html ./coverage"
+        ],
+        "coverage-text": [
+            "phpunit --coverage-text"
+        ],
+        "format": [
+            "php-cs-fixer fix --show-progress=estimating --config=.php_cs.dist"
         ]
     }
 }
