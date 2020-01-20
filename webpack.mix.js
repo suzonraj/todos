@@ -17,14 +17,8 @@ mix.js('resources/js/app.js', 'public/js')
         'jquery',
         'bootstrap',
         'popper.js',
-        'jquery.appear',
         'lodash',
         'vue',
-        'select2',
-        '@fortawesome/fontawesome-svg-core',
-        '@fortawesome/free-brands-svg-icons',
-        '@fortawesome/free-regular-svg-icons',
-        '@fortawesome/free-solid-svg-icons'
     ]);
 
 if (mix.inProduction()) {
