@@ -12,4 +12,32 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-   .sass('resources/sass/app.scss', 'public/css');
+    .sass('resources/sass/app.scss', 'public/css')
+    .extract([
+        'jquery',
+        'bootstrap',
+        'popper.js',
+        'jquery.appear',
+        'lodash',
+        'vue',
+        'select2',
+        '@fortawesome/fontawesome-svg-core',
+        '@fortawesome/free-brands-svg-icons',
+        '@fortawesome/free-regular-svg-icons',
+        '@fortawesome/free-solid-svg-icons'
+    ]);
+
+if (mix.inProduction()) {
+    mix.version()
+        .options({
+            cache: true,
+            parallel: true,
+            sourceMap: true,
+            processCssUrls: true
+        });
+} else {
+    // Uses inline source-maps on development
+    mix.webpackConfig({
+        devtool: 'inline-source-map'
+    });
+}
