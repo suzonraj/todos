@@ -29,27 +29,12 @@ class Todo extends Model
      * @var array
      */
     protected $fillable = [
-        'serial',
-        'consultant_id',
-        'procedure_id',
-        'procedure_type_id',
-        'patient_id',
-        'trans_date',
-        'notes',
+        'todo',
+        'status',
     ];
 
     /**
      * @var array
      */
     protected $dates = ['deleted_at', 'trans_date'];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'trans_date' => 'date:Y-m-d',
-        'active' => 'boolean',
-    ];
 }
