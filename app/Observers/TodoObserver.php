@@ -20,7 +20,7 @@ class TodoObserver
      */
     public function retrieved($model): void
     {
-//        \Log::info('Retrieved By:'). \Auth::user()->id;
+//
     }
 
     /**
@@ -31,7 +31,7 @@ class TodoObserver
      */
     public function creating($model): void
     {
-        $model->created_by = \Auth::user()->id;
+//
     }
 
     /**
@@ -51,7 +51,7 @@ class TodoObserver
      */
     public function updating($model): void
     {
-        $model->updated_by = \Auth::user()->id;
+        //
     }
 
     /**
@@ -71,7 +71,7 @@ class TodoObserver
      */
     public function deleting($model): void
     {
-        $model->deleted_by = \Auth::user()->id;
+        //
     }
 
     /**
@@ -111,7 +111,7 @@ class TodoObserver
      */
     public function removing($model): void
     {
-        $model->deleted_by = \Auth::user()->id;
+//
     }
 
     /**

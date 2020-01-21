@@ -27,57 +27,11 @@ class TodoRepository extends BaseRepository
     /**
      * Get all patient by date
      *
-     * @param        $transDate
-     * @param  bool  $consultantId
      * @return mixed
      */
-    public function getAllByDate($transDate, $consultantId = false)
+    public function getAll()
     {
-        return $this->model::select([
-            'id', 'serial', 'consultant_id', 'patient_id', 'procedure_id', 'procedure_type_id', 'trans_date', 'notes'
-        ])
-            ->with([
-                'details' => function ($q) {
-                    $q->select(['id', 'trans_id', 'serial', 'condition_id', 'value_type', 'value']);
-                }
-            ])
-            ->with([
-                'details.condition' => function ($q) {
-                    $q->select(['id', 'name', 'type', 'value_type'])->active();
-                }
-            ])
-            ->with([
-                'consultant' => function ($q) {
-                    $q->select(['id', 'title', 'first_name', 'last_name']);
-                }
-            ])
-            ->with([
-                'patient' => function ($q) {
-                    $q->select([
-                        'id', 'pid', 'title', 'first_name', 'last_name', 'nationality_id', 'gender', 'age', 'bed_no'
-                    ]);
-                }
-            ])
-            ->with([
-                'patient.nationality' => function ($q) {
-                    $q->select(['id', 'name']);
-                }
-            ])
-            ->with([
-                'procedure' => function ($q) {
-                    $q->select(['id', 'name']);
-                }
-            ])
-            ->with([
-                'procedure_type' => function ($q) {
-                    $q->select(['id', 'name']);
-                }
-            ])
-            ->where('trans_date', $transDate)
-            ->when($consultantId, function ($q) use ($consultantId) {
-                $q->where('consultant_id', $consultantId);
-            })
-            ->get();
+        return $this->model->get();
     }
 
     /**
@@ -90,29 +44,12 @@ class TodoRepository extends BaseRepository
     public function create(array $data): Todo
     {
         return DB::transaction(function () use ($data) {
-            $data['serial'] = $this->generateSerial();
 
             $model = $this->model::create([
-                'serial' => $data['serial'],
-                'consultant_id' => $data['consultant_id'],
-                'patient_id' => $data['patient_id'],
-                'procedure_id' => $data['procedure_id'],
-                'procedure_type_id' => $data['procedure_type'],
-                'trans_date' => Carbon::createFromFormat('d/m/Y', $data['Todo_date']),
-                'notes' => $data['notes']
+                'todo' => $data['body']
             ]);
 
             if ($model) {
-                $data['trans_id'] = $model->id;
-                $data['serial'] = $model->serial;
-
-                foreach ($data['conditions'] as $id => $condition) {
-                    $data['condition_id'] = $id;
-                    $data['value'] = $condition['value'];
-                    $data['value_type'] = $condition['type'];
-
-                }
-
                 event(new TodoCreated($model));
 
                 return $model;

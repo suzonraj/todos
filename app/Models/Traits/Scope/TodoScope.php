@@ -12,12 +12,19 @@ trait TodoScope
 {
     /**
      * @param        $query
-     * @param  bool  $status
-     *
      * @return mixed
      */
-    public function scopeActive($query, $status = true)
+    public function scopeActive($query)
     {
-        return $query->where('active', $status);
+        return $query->where('status', 1);
+    }
+
+    /**
+     * @param        $query
+     * @return mixed
+     */
+    public function scopeComplete($query)
+    {
+        return $query->where('status', 2);
     }
 }

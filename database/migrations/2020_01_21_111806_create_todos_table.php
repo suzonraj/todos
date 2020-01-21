@@ -18,10 +18,6 @@ class CreateTodosTable extends Migration
             $table->string('todo');
             $table->tinyInteger('status')->default(1);
 
-            $table->integer('created_by')->unsigned()->index();
-            $table->integer('updated_by')->unsigned()->nullable();
-            $table->integer('deleted_by')->unsigned()->nullable();
-
             $table->timestamps();
             $table->softDeletes();
         });

@@ -15,6 +15,14 @@ trait TodoMethod
      */
     public function isActive()
     {
-        return $this->active;
+        return $this->status == 1;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCompleted()
+    {
+        return $this->status == 2;
     }
 }

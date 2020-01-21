@@ -7,6 +7,12 @@
 
                     <div class="card-body">
                         <input type="text" v-model="newTodo" @keyup.enter="addNewTodo"/>
+
+                        <ul v-if="todos && todos.length">
+                            <li v-for="todo of todos" :key="todo.id" :class="todo.completed ? 'completed' : '' ">
+                                <p><strong>{{todo.todo}}</strong></p>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -16,15 +22,26 @@
 
 <script>
     export default {
+        props: {
+            route: {type: String, required: true}
+        },
         mounted() {
             //console.log('Component mounted.')
         },
-        props: {
-            route: {type: String, required: true}
+        // Fetches todos when the component is created.
+        created() {
+            axios.get(this.route)
+                .then(response => {
+                    this.todos = response.data.data;
+                })
+                .catch(e => {
+                    this.errors.push(e)
+                })
         },
         data: function () {
             return {
                 newTodo: '',
+                todos: [],
                 errors: [],
             }
         },
@@ -34,7 +51,8 @@
                     body: this.newTodo
                 })
                     .then(response => {
-                        console.log(response);
+                        this.todos.push(response.data);
+                        this.newTodo = '';
                     })
                     .catch(e => {
                         this.errors.push(e)
