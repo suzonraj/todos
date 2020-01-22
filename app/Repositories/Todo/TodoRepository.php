@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Backend\Transaction;
 
+use App\Events\Todo\TodoCompleted;
 use App\Events\Todo\TodoCreated;
 use App\Exceptions\GeneralException;
 use App\Models\Todo;
@@ -152,5 +153,26 @@ class TodoRepository extends BaseRepository
         } catch (\Throwable $e) {
             throw $e;
         }
+    }
+
+    /**
+     * @param $id
+     * @return Todo
+     * @throws Throwable
+     */
+    public function complete($id): Todo
+    {
+        return DB::transaction(function () use ($id) {
+            $model = $this->getById($id);
+
+            if ($model->update([
+                'status' => 2,
+            ])) {
+
+                event(new TodoCompleted($model));
+
+                return $model;
+            }
+        });
     }
 }

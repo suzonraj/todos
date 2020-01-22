@@ -8,11 +8,20 @@
                     <div class="card-body">
                         <input type="text" v-model="newTodo" @keyup.enter="addNewTodo"/>
 
-                        <ul v-if="todos && todos.length">
-                            <li v-for="todo of todos" :key="todo.id" :class="todo.completed ? 'completed' : '' ">
-                                <p><strong>{{todo.todo}}</strong></p>
-                            </li>
-                        </ul>
+                        <div v-if="todos && todos.length">
+                            <div class="form-group clearfix" v-for="todo of todos" :key="todo.id">
+                                <div class="icheck-success d-inline">
+                                    <input type="checkbox" :id="'todo'+todo.id" @click="completeTodo(todo.id)"/>
+                                    <label :for="'todo'+todo.id" :class="todo.completed ? 'completed' : '' ">
+                                        {{todo.todo}}
+                                    </label>
+                                </div>
+
+                                <span class="text-right">x</span>
+
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -30,7 +39,7 @@
         },
         // Fetches todos when the component is created.
         created() {
-            axios.get(this.route)
+            axios.get(this.route + '/todos')
                 .then(response => {
                     this.todos = response.data.data;
                 })
@@ -47,7 +56,7 @@
         },
         methods: {
             addNewTodo() {
-                axios.post(this.route, {
+                axios.post(this.route + '/todos', {
                     body: this.newTodo
                 })
                     .then(response => {
@@ -57,6 +66,25 @@
                     .catch(e => {
                         this.errors.push(e)
                     })
+            },
+            completeTodo(id) {
+                axios.patch(this.route + '/todo/' + id + '/complete')
+                    .then(response => {
+                        const currentIndex = this.todos.findIndex(o => o.id === id);
+
+                        let todo = _.find(this.todos, function (o) {
+                            return o.id === id;
+                        });
+                        todo.completed = true;
+
+                        this.todos[currentIndex] = todo;
+                    })
+                    .catch(e => {
+                        this.errors.push(e)
+                    })
+            },
+            refreshList() {
+                // _.filter(users, function(o) { return !o.active; });
             }
         },
         // watch: {

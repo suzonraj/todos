@@ -89,4 +89,23 @@ class TodoController extends Controller
     {
         //
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Exceptions\GeneralException
+     * @throws \Throwable
+     */
+    public function complete($id)
+    {
+        $model = $this->repository->complete($id);
+
+        if($model){
+            return response()->json(['error'=>false], 200);
+        }
+
+        return response()->json(['error'=>true]);
+    }
 }

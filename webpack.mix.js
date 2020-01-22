@@ -19,6 +19,7 @@ mix.js('resources/js/app.js', 'public/js')
         'popper.js',
         'lodash',
         'vue',
+        'icheck-bootstrap',
     ]);
 
 if (mix.inProduction()) {

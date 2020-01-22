@@ -11,8 +11,15 @@
 |
 */
 
+use App\Http\Controllers\TodoController;
+
 Route::get('/', function () {
     return view('index');
 });
 
 Route::apiResource('todos', 'TodoController');
+
+// Specific Todo
+Route::group(['prefix' => 'todo/{id}'], function () {
+    Route::patch('/complete', [TodoController::class, 'complete'])->name('todo.complete');
+});
