@@ -50,7 +50,7 @@ class TodoController extends Controller
     {
         $model =  $this->repository->create($request->all());
         if($model){
-            return response()->json($model, 200);
+            return response()->json(new TodoResource($model), 200);
         }
 
         return response()->json(['error'=>true]);
@@ -83,11 +83,18 @@ class TodoController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
      */
     public function destroy($id)
     {
-        //
+        $model = $this->repository->delete($id);
+
+        if($model){
+            return response()->json(['error'=>false], 200);
+        }
+
+        return response()->json(['error'=>true]);
     }
 
     /**

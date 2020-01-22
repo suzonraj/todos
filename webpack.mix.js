@@ -18,6 +18,7 @@ mix.js('resources/js/app.js', 'public/js')
         'bootstrap',
         'popper.js',
         'lodash',
+        'axios',
         'vue',
         'icheck-bootstrap',
     ]);

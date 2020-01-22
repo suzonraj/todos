@@ -8,20 +8,37 @@
                     <div class="card-body">
                         <input type="text" v-model="newTodo" @keyup.enter="addNewTodo"/>
 
-                        <div v-if="todos && todos.length">
-                            <div class="form-group clearfix" v-for="todo of todos" :key="todo.id">
+                        <div v-if="filterTodo && filterTodo.length">
+                            <div class="form-group clearfix" v-for="todo of filterTodo" :key="todo.id">
                                 <div class="icheck-success d-inline">
-                                    <input type="checkbox" :id="'todo'+todo.id" @click="completeTodo(todo.id)"/>
+                                    <input type="radio" :id="'todo'+todo.id" @click="completeTodo(todo.id)"/>
                                     <label :for="'todo'+todo.id" :class="todo.completed ? 'completed' : '' ">
                                         {{todo.todo}}
                                     </label>
                                 </div>
 
-                                <span class="text-right">x</span>
-
+                                <a href="" class="text-right" @click.prevent="deleteTodo(todo.id)">x</a>
                             </div>
                         </div>
-
+                    </div>
+                    <div class="card-footer" v-if="filterTodo.length">
+                        <div class="row">
+                            <div class="col-4">
+                                <span>{{ filterTodo.length }}</span> {{ (filterTodo.length > 1) ? 'items' : 'item' }} left
+                            </div>
+                            <div class="col-2">
+                                <a href="" @click.prevent="status = 'all'">All</a>
+                            </div>
+                            <div class="col-2">
+                                <a href="" @click.prevent="status='active'">Active</a>
+                            </div>
+                            <div class="col-2">
+                                <a href="#" @click.prevent="status='complete'">Completed</a>
+                            </div>
+                            <div class="col-2">
+                                <a href="#" @click.prevent="clearCompleted">Clear Completed</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -50,6 +67,7 @@
         data: function () {
             return {
                 newTodo: '',
+                status: 'all',
                 todos: [],
                 errors: [],
             }
@@ -83,8 +101,41 @@
                         this.errors.push(e)
                     })
             },
-            refreshList() {
+            deleteTodo(id) {
+                axios.delete(this.route + '/todos/' + id)
+                    .then(response => {
+                        const currentIndex = this.todos.findIndex(t => t.id === id);
+                        this.$delete(this.todos, currentIndex);
+                    })
+                    .catch(e => {
+                        this.errors.push(e)
+                    })
+            },
+            clearCompleted() {
                 // _.filter(users, function(o) { return !o.active; });
+            }
+        },
+        computed: {
+            filterTodo: function () {
+                if (this.status === 'all'){
+                    return this.todos;
+                }
+
+                if (this.status === 'active'){
+                    return this.todos.filter(t => {
+                        return t.completed === false;
+                    })
+                }
+
+                if (this.status === 'complete'){
+                    return this.todos.filter(t => {
+                        return t.completed === true;
+                    })
+                }
+
+                // return this.todos.filter(t => {
+                //     return this.status === 'active' ? t.completed = false : t.completed = true;
+                // })
             }
         },
         // watch: {

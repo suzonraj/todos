@@ -4,6 +4,7 @@ namespace App\Repositories\Backend\Transaction;
 
 use App\Events\Todo\TodoCompleted;
 use App\Events\Todo\TodoCreated;
+use App\Events\Todo\TodoDeleted;
 use App\Exceptions\GeneralException;
 use App\Models\Todo;
 use App\Repositories\BaseRepository;
@@ -47,7 +48,8 @@ class TodoRepository extends BaseRepository
         return DB::transaction(function () use ($data) {
 
             $model = $this->model::create([
-                'todo' => $data['body']
+                'todo' => $data['body'],
+                'status' => 1
             ]);
 
             if ($model) {
@@ -101,21 +103,16 @@ class TodoRepository extends BaseRepository
 
     /**
      * @param $id
-     * @return Todo
-     * @throws GeneralException
+     * @return mixed
      * @throws Throwable
      */
-    public function forceDelete($id): Todo
+    public function delete($id)
     {
-        $model = $this->withTrashed()->find($id);
-        if ($model->deleted_at === null) {
-            throw new GeneralException(trans('This record must be deleted first before it can be destroyed permanently.!'));
-        }
-
+        $model = $this->getById($id);
         try {
-            return DB::transaction(function () use ($model) {
-                if ($model->forceDelete()) {
-                    event(new TodoPermanentlyDeleted($model));
+            return DB::transaction(function () use ($model, $id) {
+                if ($this->deleteById($id)) {
+                    event(new TodoDeleted($model));
                     return true;
                 }
 
