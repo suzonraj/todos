@@ -7,7 +7,6 @@ use App\Models\Traits\Method\TodoMethod;
 use App\Models\Traits\Relationship\TodoRelationship;
 use App\Models\Traits\Scope\TodoScope;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 /**
@@ -17,8 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Todo extends Model
 {
-    use SoftDeletes,
-        TodoAttribute,
+    use TodoAttribute,
         TodoMethod,
         TodoRelationship,
         TodoScope;

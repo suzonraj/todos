@@ -19,7 +19,6 @@ class CreateTodosTable extends Migration
             $table->tinyInteger('status')->default(1);
 
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

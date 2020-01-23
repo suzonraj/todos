@@ -112,7 +112,14 @@
                     })
             },
             clearCompleted() {
-                // _.filter(users, function(o) { return !o.active; });
+                axios.post(this.route + '/todos/clear-completed')
+                    .then(response => {
+                        this.todos =  this.todos.filter(t => t.complete === false);
+                        this.status = 'active';
+                    })
+                    .catch(e => {
+                        this.errors.push(e)
+                    })
             }
         },
         computed: {

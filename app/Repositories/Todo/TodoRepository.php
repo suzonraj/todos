@@ -126,35 +126,6 @@ class TodoRepository extends BaseRepository
     /**
      * @param $id
      * @return Todo
-     * @throws GeneralException
-     * @throws Throwable
-     */
-    public function restore($id): Todo
-    {
-        $model = $this->model->withTrashed()->find($id);
-
-        if ($model->deleted_at === null) {
-            throw new GeneralException(trans('This record is not deleted so it can not be restored.'));
-        }
-
-        try {
-            return DB::transaction(function () use ($model) {
-                if ($model->restore()) {
-                    event(new TodoRestored($model));
-
-                    return $model;
-                }
-
-                throw new GeneralException(trans('There was a problem restoring this record. Please try again.'));
-            });
-        } catch (\Throwable $e) {
-            throw $e;
-        }
-    }
-
-    /**
-     * @param $id
-     * @return Todo
      * @throws Throwable
      */
     public function complete($id): Todo
@@ -170,6 +141,24 @@ class TodoRepository extends BaseRepository
 
                 return $model;
             }
+        });
+    }
+
+    /**
+     * @return Todo
+     * @throws Throwable
+     */
+    public function clearCompleted()
+    {
+        return DB::transaction(function () {
+            $completedTodo = $this->model->complete()->get();
+
+            foreach ($completedTodo as $todo){
+                $todo->forceDelete();
+                event(new TodoDeleted($todo));
+            }
+
+            return true;
         });
     }
 }

@@ -18,6 +18,7 @@ Route::get('/', function () {
 });
 
 Route::apiResource('todos', 'TodoController');
+Route::post('todos/clear-completed', [TodoController::class, 'clearCompleted'])->name('todo.clear_complete');
 
 // Specific Todo
 Route::group(['prefix' => 'todo/{id}'], function () {
