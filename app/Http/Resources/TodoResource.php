@@ -23,6 +23,7 @@ class TodoResource extends JsonResource
             'id' => $this->id,
             'todo' => $this->todo,
             'completed' => $this->isCompleted(),
+            'update' => false,
         ];
     }
 }

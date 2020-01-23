@@ -71,12 +71,19 @@ class TodoController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  int                       $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Throwable
      */
     public function update(Request $request, $id)
     {
-        //
+        $model =  $this->repository->update($id, $request->all());
+
+        if($model){
+            return response()->json(new TodoResource($model), 200);
+        }
+
+        return response()->json(['error'=>true]);
     }
 
     /**

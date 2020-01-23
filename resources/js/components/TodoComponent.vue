@@ -7,12 +7,21 @@
 
                     <div class="card-body">
                         <input type="text" v-model="newTodo" @keyup.enter="addNewTodo"/>
+                        <br>
 
                         <div v-if="filterTodo && filterTodo.length">
                             <div class="form-group clearfix" v-for="todo of filterTodo" :key="todo.id">
                                 <div class="icheck-success d-inline">
                                     <input type="radio" :id="'todo'+todo.id" @click="completeTodo(todo.id)"/>
-                                    <label :for="'todo'+todo.id" :class="todo.completed ? 'completed' : '' ">
+
+                                    <input
+                                        v-if="todo.update"
+                                        v-model="todo.todo"
+                                        @blur="todo.update = false; updateTodo(todo)"
+                                        @keyup.enter="todo.update=false; updateTodo(todo)"
+                                        v-focus/>
+
+                                    <label v-else @click="todo.update = true" :class="todo.completed ? 'completed' : '' ">
                                         {{todo.todo}}
                                     </label>
                                 </div>
@@ -66,26 +75,51 @@
         },
         data: function () {
             return {
-                newTodo: '',
+                newTodo: null,
+                updatedTodo: null,
                 status: 'all',
                 todos: [],
                 errors: [],
             }
         },
         methods: {
-            addNewTodo() {
+            addNewTodo: function() {
                 axios.post(this.route + '/todos', {
                     body: this.newTodo
                 })
                     .then(response => {
                         this.todos.push(response.data);
-                        this.newTodo = '';
+                        this.newTodo = null;
                     })
                     .catch(e => {
                         this.errors.push(e)
                     })
             },
-            completeTodo(id) {
+            updateTodo: function(todo){
+                axios.patch(this.route + '/todos/' + todo.id, {
+                    body: todo.todo
+                })
+                    .then(response => {
+                        const currentIndex = this.todos.findIndex(o => o.id === todo.id);
+
+                        this.todos[currentIndex] = todo;
+                        this.updatedTodo = null;
+                    })
+                    .catch(e => {
+                        this.errors.push(e)
+                    })
+            },
+            deleteTodo: function(id) {
+                axios.delete(this.route + '/todos/' + id)
+                    .then(response => {
+                        const currentIndex = this.todos.findIndex(t => t.id === id);
+                        this.$delete(this.todos, currentIndex);
+                    })
+                    .catch(e => {
+                        this.errors.push(e)
+                    })
+            },
+            completeTodo: function(id) {
                 axios.patch(this.route + '/todo/' + id + '/complete')
                     .then(response => {
                         const currentIndex = this.todos.findIndex(o => o.id === id);
@@ -101,17 +135,7 @@
                         this.errors.push(e)
                     })
             },
-            deleteTodo(id) {
-                axios.delete(this.route + '/todos/' + id)
-                    .then(response => {
-                        const currentIndex = this.todos.findIndex(t => t.id === id);
-                        this.$delete(this.todos, currentIndex);
-                    })
-                    .catch(e => {
-                        this.errors.push(e)
-                    })
-            },
-            clearCompleted() {
+            clearCompleted: function() {
                 axios.post(this.route + '/todos/clear-completed')
                     .then(response => {
                         this.todos =  this.todos.filter(t => t.complete === false);
@@ -145,6 +169,13 @@
                 // })
             }
         },
+        directives: {
+            focus: {
+                inserted (el) {
+                    el.focus()
+                }
+            }
+        }
         // watch: {
         //     new_task: {
         //         immediate: true,

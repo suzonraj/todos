@@ -5,6 +5,7 @@ namespace App\Repositories\Backend\Transaction;
 use App\Events\Todo\TodoCompleted;
 use App\Events\Todo\TodoCreated;
 use App\Events\Todo\TodoDeleted;
+use App\Events\Todo\TodoUpdated;
 use App\Exceptions\GeneralException;
 use App\Models\Todo;
 use App\Repositories\BaseRepository;
@@ -75,29 +76,13 @@ class TodoRepository extends BaseRepository
             $model = $this->getById($id);
 
             if ($model->update([
-                'consultant_id' => $data['consultant_id'],
-                'patient_id' => $data['patient_id'],
-                'procedure_id' => $data['procedure_id'],
-                'procedure_type_id' => $data['procedure_type'],
-                'trans_date' => Carbon::createFromFormat('d/m/Y', $data['Todo_date']),
-                'notes' => $data['notes']
+                'todo' => $data['body'],
             ])) {
-                $data['trans_id'] = $model->id;
-                $data['serial'] = $model->serial;
-
-
-//                    $data['condition_id'] = $id;
-//                    $data['value'] = $condition['value'];
-//                    $data['value_type'] = $condition['type'];
-
-                app(TodoDetailRepository::class)->update($data);
 
                 event(new TodoUpdated($model));
 
                 return $model;
             }
-
-            throw new GeneralException(trans('There was a problem updating this record. Please try again.'));
         });
     }
 
