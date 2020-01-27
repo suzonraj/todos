@@ -1,5 +1,5 @@
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 
 // Variables
 @import 'variables';
@@ -7,6 +7,19 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 @import "~icheck-bootstrap/icheck-bootstrap.css";
+@import "~@fortawesome/fontawesome-free";
+
+@mixin placeholder {
+    ::-webkit-input-placeholder {@content}
+    :-moz-placeholder           {@content}
+    ::-moz-placeholder          {@content}
+    :-ms-input-placeholder      {@content}
+}
+
+#app{
+    background: #f9f9f9;
+    font-family: "Roboto", sans-serif;
+}
 
 .navbar-laravel {
     background-color: #fff;
@@ -15,4 +28,66 @@
 
 .completed{
     text-decoration: line-through;
+    color: #bdbdbd;
+}
+
+.main-div{
+    background: #fff;
+    box-shadow:
+        0 1px 1px rgba(0,0,0,0.15),
+        0 10px 0 -5px #f7f3f3,
+        0 10px 1px -4px rgba(0,0,0,0.15),
+        0 20px 0 -10px #f7f3f3,
+        0 20px 1px -9px rgba(0,0,0,0.15);
+    padding: 10px;
+    font-size: 16px;
+    color: #707070;
+    font-weight: bold;
+}
+
+a, a.cancel{
+    color: #707070;
+    font-weight: normal;
+    font-size: 13px;
+}
+
+.separator{
+    border-color: #f9f9f9;
+}
+
+.separator-f{
+    border-color: #fdfdfd;
+}
+
+.logo h1{
+    font-size: 100px;
+    color: #ebdee1;
+}
+
+.footer{
+    position: relative;
+    width: 95%;
+    left: 16px;
+    top: 0;
+    border-top: 1px solid #444;
+}
+
+.todo-list{
+    border-bottom: 1px dotted #fdfdfd;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.right a:hover{
+    color: #fff;
+}
+
+@include placeholder {
+    font-style: italic;
+    font-weight: 400;
+    color: #8c8c8c;
+}
+
+.no-border{
+   border: none;
 }
