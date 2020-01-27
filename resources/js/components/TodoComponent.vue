@@ -1,167 +1,126 @@
 <template>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">Todo Component</div>
+    <section id="todos">
+        <div class="row mx-0">
+            <div class="col-lg-12 px-0">
+                <div class="logo text-center">
+                    <h1>todos</h1>
+                </div>
+            </div>
+            <div class="col-6 col-xs-12 m-auto">
+                <div class="main-div">
+                    <div class="m-auto">
+                            <div class="row mb-2">
+                                <div class="col-1 pr-0">
+                                    <span><i class="far fa-arrow-down"></i></span>
+                                </div>
+                                <div class="col-11 pl-0">
+                                    <input type="text" v-model="newTodo.todo" @keyup.enter.prevent="addNewTodo" class="w-100 no-border" placeholder="Whats need to be done?"/>
+                                </div>
+                            </div>
 
-                    <div class="card-body">
-                        <input type="text" v-model="newTodo" @keyup.enter="addNewTodo"/>
-                        <br>
-
-                        <div v-if="filterTodo && filterTodo.length">
-                            <div class="form-group clearfix" v-for="todo of filterTodo" :key="todo.id">
+                        <hr class="m-0 separator">
+                        <div v-if="filterTodos && filterTodos.length" class="mt-2">
+                            <div class="todo-list clearfix" v-for="todo of filterTodos" :key="todo.id" @mouseover="todo.actions = true;$emit('update');" @mouseleave="todo.actions = false;$emit('update');">
                                 <div class="icheck-success d-inline">
-                                    <input type="radio" :id="'todo'+todo.id" @click="completeTodo(todo.id)"/>
-
-                                    <input
-                                        v-if="todo.update"
-                                        v-model="todo.todo"
-                                        @blur="todo.update = false; updateTodo(todo)"
-                                        @keyup.enter="todo.update=false; updateTodo(todo)"
-                                        v-focus/>
-
-                                    <label v-else @click="todo.update = true" :class="todo.completed ? 'completed' : '' ">
-                                        {{todo.todo}}
-                                    </label>
+                                    <input v-show="filterTodos.actions" type="radio" :id="'todo'+todo.id" @click="completeTodo(todo.id)" :checked="todo.completed"/>
+                                    <label :for="'todo'+todo.id"></label>
                                 </div>
 
-                                <a href="" class="text-right" @click.prevent="deleteTodo(todo.id)">x</a>
+                                <input
+                                    v-if="todo.update && !todo.completed"
+                                    v-model="todo.todo"
+                                    @blur="todo.update = false; updateTodo(todo)"
+                                    @keyup.enter="todo.update=false; updateTodo(todo)"
+                                    v-focus/>
+
+                                <label v-else @click="todo.update = true"
+                                       :class="todo.completed ? 'completed' : '' ">
+                                    {{todo.todo}}
+                                </label>
+
+                                <a v-show="filterTodos.actions" href="" class="float-right cancel" @click.prevent="deleteTodo(todo.id)">x</a>
                             </div>
+
                         </div>
                     </div>
-                    <div class="card-footer" v-if="filterTodo.length">
-                        <div class="row">
-                            <div class="col-4">
-                                <span>{{ filterTodo.length }}</span> {{ (filterTodo.length > 1) ? 'items' : 'item' }} left
+                    <hr class="m-0 separator">
+                    <div class="footer" v-if="filterTodos.length">
+                        <div class="col-lg-12">
+                            <div class="left float-left">
+                                <a href="#"> <span>{{ filterTodos.length }}</span> {{ (filterTodos.length > 1) ? 'items' :
+                                    'item' }} left</a>
                             </div>
-                            <div class="col-2">
-                                <a href="" @click.prevent="status = 'all'">All</a>
-                            </div>
-                            <div class="col-2">
-                                <a href="" @click.prevent="status='active'">Active</a>
-                            </div>
-                            <div class="col-2">
-                                <a href="#" @click.prevent="status='complete'">Completed</a>
-                            </div>
-                            <div class="col-2">
-                                <a href="#" @click.prevent="clearCompleted">Clear Completed</a>
+                            <div class="right float-right">
+                                <a href="" @click.prevent="filterBy = 'all'">All</a>
+                                <a href="" @click.prevent="filterBy = 'active'">Active</a>
+                                <a href="#" @click.prevent="filterBy = 'complete'">Completed</a>
+                                <a href="#" @click.prevent="clearCompleted()">Clear Completed</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script>
+    import { mapGetters } from "vuex";
+
     export default {
-        props: {
-            route: {type: String, required: true}
-        },
         mounted() {
             //console.log('Component mounted.')
         },
-        // Fetches todos when the component is created.
         created() {
-            axios.get(this.route + '/todos')
-                .then(response => {
-                    this.todos = response.data.data;
-                })
-                .catch(e => {
-                    this.errors.push(e)
-                })
+            this.$store.dispatch("GET_TODOS");
         },
         data: function () {
             return {
-                newTodo: null,
-                updatedTodo: null,
-                status: 'all',
-                todos: [],
-                errors: [],
+                filterBy: 'all'
             }
         },
         methods: {
-            addNewTodo: function() {
-                axios.post(this.route + '/todos', {
-                    body: this.newTodo
-                })
-                    .then(response => {
-                        this.todos.push(response.data);
-                        this.newTodo = null;
-                    })
-                    .catch(e => {
-                        this.errors.push(e)
-                    })
+            addNewTodo: function () {
+                this.$store.dispatch("ADD_TODO");
             },
-            updateTodo: function(todo){
-                axios.patch(this.route + '/todos/' + todo.id, {
-                    body: todo.todo
-                })
-                    .then(response => {
-                        const currentIndex = this.todos.findIndex(o => o.id === todo.id);
-
-                        this.todos[currentIndex] = todo;
-                        this.updatedTodo = null;
-                    })
-                    .catch(e => {
-                        this.errors.push(e)
-                    })
+            updateTodo: function (todo) {
+                this.$store.dispatch("UPDATE_TODO", todo);
             },
-            deleteTodo: function(id) {
-                axios.delete(this.route + '/todos/' + id)
-                    .then(response => {
-                        const currentIndex = this.todos.findIndex(t => t.id === id);
-                        this.$delete(this.todos, currentIndex);
-                    })
-                    .catch(e => {
-                        this.errors.push(e)
-                    })
+            deleteTodo: function (id) {
+                this.$store.dispatch("DELETE_TODO", id);
             },
-            completeTodo: function(id) {
-                axios.patch(this.route + '/todo/' + id + '/complete')
-                    .then(response => {
-                        const currentIndex = this.todos.findIndex(o => o.id === id);
-
-                        let todo = _.find(this.todos, function (o) {
-                            return o.id === id;
-                        });
-                        todo.completed = true;
-
-                        this.todos[currentIndex] = todo;
-                    })
-                    .catch(e => {
-                        this.errors.push(e)
-                    })
+            completeTodo: function (id) {
+                this.$store.dispatch("COMPLETE_TODO", id);
             },
-            clearCompleted: function() {
-                axios.post(this.route + '/todos/clear-completed')
-                    .then(response => {
-                        this.todos =  this.todos.filter(t => t.complete === false);
-                        this.status = 'active';
-                    })
-                    .catch(e => {
-                        this.errors.push(e)
-                    })
-            }
+            clearCompleted: function () {
+                this.$store.dispatch("CLEAR_COMPLETE_TODO");
+            },
+            // _findTodoIndexById: function (id) {
+            //     return this.todos.findIndex(o => o.id === id);
+            // },
+            // _findTodoById: function (id) {
+            //     return _.find(this.todos, function (o) {
+            //         return o.id === id;
+            //     });
+            // },
         },
         computed: {
-            filterTodo: function () {
-                if (this.status === 'all'){
-                    return this.todos;
+            ...mapGetters(["newTodo"]),
+            errors (){
+                return this.$store.getters.errors
+            },
+
+            filterTodos: function () {
+                if (this.filterBy === 'all') {
+                    return this.$store.getters.todos
                 }
 
-                if (this.status === 'active'){
-                    return this.todos.filter(t => {
-                        return t.completed === false;
-                    })
+                if (this.filterBy === 'active') {
+                    return this.$store.getters.todos.filter(todo => todo.completed === false);
                 }
 
-                if (this.status === 'complete'){
-                    return this.todos.filter(t => {
-                        return t.completed === true;
-                    })
+                if (this.filterBy === 'complete') {
+                    return this.$store.getters.todos.filter(todo => todo.completed);
                 }
 
                 // return this.todos.filter(t => {
@@ -171,18 +130,10 @@
         },
         directives: {
             focus: {
-                inserted (el) {
+                inserted(el) {
                     el.focus()
                 }
             }
         }
-        // watch: {
-        //     new_task: {
-        //         immediate: true,
-        //         handler() {
-        //             this.addNewTask();
-        //         }
-        //     }
-        // }
     }
 </script>

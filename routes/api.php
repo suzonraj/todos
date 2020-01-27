@@ -19,10 +19,9 @@ use Illuminate\Http\Request;
 //});
 //
 
-Route::apiResource('todos', 'TodoController');
-Route::post('todos/clear-completed', [TodoController::class, 'clearCompleted'])->name('todo.clear_complete');
-
-// Specific Todo
-Route::group(['prefix' => 'todo/{id}'], function () {
-    Route::patch('/complete', [TodoController::class, 'complete'])->name('todo.complete');
-});
+Route::get('todos', [TodoController::class,'index']);
+Route::post('todos', [TodoController::class,'store']);
+Route::patch('todos/{todo}', [TodoController::class,'update']);
+Route::delete('todos/{todo}', [TodoController::class,'destroy']);
+Route::patch('todos/{todo}/complete', [TodoController::class,'complete']);
+Route::post('todos/clear-completed', [TodoController::class, 'clearCompleted']);

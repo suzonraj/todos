@@ -19,6 +19,8 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
+import store from '../js/store'
+
 Vue.component('todo-component', require('./components/TodoComponent.vue').default);
 
 /**
@@ -29,4 +31,5 @@ Vue.component('todo-component', require('./components/TodoComponent.vue').defaul
 
 const app = new Vue({
     el: '#app',
+    store
 });

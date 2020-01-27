@@ -9,6 +9,12 @@
     @stack('before-styles')
     <link href="{{ asset(mix('css/app.css')) }}" rel="stylesheet">
     @stack('after-styles')
+
+    <script>
+        window.Laravel = {
+            route: '{{ url('/api/') }}'
+        }
+    </script>
 </head>
 <body>
 <div id="app">
