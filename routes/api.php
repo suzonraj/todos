@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TodoController;
 use Illuminate\Http\Request;
 
 /*
@@ -13,6 +14,15 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+//Route::middleware('auth:api')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
+//
+
+Route::apiResource('todos', 'TodoController');
+Route::post('todos/clear-completed', [TodoController::class, 'clearCompleted'])->name('todo.clear_complete');
+
+// Specific Todo
+Route::group(['prefix' => 'todo/{id}'], function () {
+    Route::patch('/complete', [TodoController::class, 'complete'])->name('todo.complete');
 });
