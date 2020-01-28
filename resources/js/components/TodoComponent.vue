@@ -11,7 +11,7 @@
 
                     <div class="row mb-2">
                         <div class="col-1 pr-0">
-                            <span><i class="far fa-arrow-down"></i></span>
+                            <span><i class="arrow down"></i></span>
                         </div>
                         <div class="col-11 pl-0">
                             <input type="text" v-model="newTodo.todo" @keyup.enter.prevent="addNewTodo"
