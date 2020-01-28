@@ -13,8 +13,7 @@ let mutations = {
         state.todos[t] = todo;
     },
     DELETE_TODO(state, todo) {
-        state.todos.splice(state.todos.indexOf(todo), 1);
-        state.removeTodo = null;
+        state.todos.splice(state.todos.findIndex(t => t.id === todo.id), 1)
     },
     COMPLETE_TODO(state, id) {
         let t = state.todos.findIndex(o => o.id === id);

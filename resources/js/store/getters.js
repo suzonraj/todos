@@ -14,8 +14,8 @@ let getters = {
     updatedTodo: state => {
         return state.updatedTodo
     },
-    completedTodos: state => {
-        return state.todos.filter(todo => todo.completed);
+    completedTodosCount: state => {
+        return state.todos.filter(todo => todo.completed).length;
     }
 };
 export default getters

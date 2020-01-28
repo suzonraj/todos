@@ -19,19 +19,20 @@ let actions = {
             });
     },
     ADD_TODO({commit}) {
-        let todo = this.state.newTodo;
-        commit('ADD_TODO', {
-            id: todo.id,
-            todo: todo.todo,
-            completed: todo.completed,
-            update: todo.update,
-            actions: false,
-        });
 
         axios.post(this.state.apiUrl + '/todos', {
             body: this.state.newTodo.todo
         }).then(res => {
-            this.state.newTodo.todo = null;
+            let todo = this.state.newTodo;
+            commit('ADD_TODO', {
+                id: todo.id,
+                todo: todo.todo,
+                completed: todo.completed,
+                update: todo.update,
+                actions: false,
+            });
+
+            todo.todo = null;
         }).catch(e => {
             commit('SET_ERROR', e);
         })
@@ -47,13 +48,12 @@ let actions = {
                 commit('SET_ERROR', e);
             });
     },
-    DELETE_TODO({commit}, id) {
-        axios.delete(this.state.apiUrl + '/todos/' + id)
+    DELETE_TODO({commit}, todo) {
+        axios.delete(this.state.apiUrl + '/todos/' + todo.id)
             .then(res => {
-                const todoIndex = this._findTodoIndexById(todo.id);
-                this.$delete(this.todos, todoIndex);
+              commit('DELETE_TODO', todo);
             }).catch(err => {
-            commit('SET_ERROR', e);
+            commit('SET_ERROR', err);
         })
     },
     COMPLETE_TODO({commit}, id) {
