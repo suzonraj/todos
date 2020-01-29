@@ -15,7 +15,7 @@ This is a simple ToDo app with Laravel 6.
 
 Clone the repository-
 ```
-git clone https://github.com/milon521/laravel-todo.git
+git clone https://github.com/suzonraj/todos.git
 ```
 
 Then cd into the folder with this command-
