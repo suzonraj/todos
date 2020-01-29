@@ -1,5 +1,5 @@
 let mutations = {
-    SET_ERROR(state, error){
+    SET_ERROR(state, error) {
         state.errors.unshift(error);
     },
     GET_TODOS(state, todos) {

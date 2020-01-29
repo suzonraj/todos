@@ -2,8 +2,6 @@
 
 namespace App\Models\Traits\Attribute;
 
-use Auth;
-
 /**
  * Trait TodoAttribute
  *

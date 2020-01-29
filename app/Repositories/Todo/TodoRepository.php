@@ -9,7 +9,6 @@ use App\Events\Todo\TodoUpdated;
 use App\Exceptions\GeneralException;
 use App\Models\Todo;
 use App\Repositories\BaseRepository;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -103,7 +102,7 @@ class TodoRepository extends BaseRepository
 
                 throw new GeneralException(trans('There was a problem deleting this record. Please try again.'));
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw $e;
         }
     }
@@ -138,7 +137,7 @@ class TodoRepository extends BaseRepository
         return DB::transaction(function () {
             $completedTodo = $this->model->complete()->get();
 
-            foreach ($completedTodo as $todo){
+            foreach ($completedTodo as $todo) {
                 $todo->forceDelete();
                 event(new TodoDeleted($todo));
             }

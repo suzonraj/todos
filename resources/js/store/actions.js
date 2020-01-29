@@ -51,7 +51,7 @@ let actions = {
     DELETE_TODO({commit}, todo) {
         axios.delete(this.state.apiUrl + '/todos/' + todo.id)
             .then(res => {
-              commit('DELETE_TODO', todo);
+                commit('DELETE_TODO', todo);
             }).catch(err => {
             commit('SET_ERROR', err);
         })

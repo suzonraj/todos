@@ -2,6 +2,12 @@
 
 namespace App\Repositories;
 
+use Exception;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Class BaseRepository.
  *
@@ -12,14 +18,14 @@ abstract class BaseRepository implements RepositoryContract
     /**
      * The repository model.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var Model
      */
     protected $model;
 
     /**
      * The query builder.
      *
-     * @var \Illuminate\Database\Eloquent\Builder
+     * @var Builder
      */
     protected $query;
 
@@ -68,7 +74,7 @@ abstract class BaseRepository implements RepositoryContract
     /**
      * Get all the model records in the database.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function all()
     {
@@ -82,6 +88,47 @@ abstract class BaseRepository implements RepositoryContract
     }
 
     /**
+     * Add relationships to the query builder to eager load.
+     *
+     * @return $this
+     */
+    protected function eagerLoad()
+    {
+        foreach ($this->with as $relation) {
+            $this->query->with($relation);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Create a new instance of the model's query builder.
+     *
+     * @return $this
+     */
+    protected function newQuery()
+    {
+        $this->query = $this->model->newQuery();
+
+        return $this;
+    }
+
+    /**
+     * Reset the query clause parameter arrays.
+     *
+     * @return $this
+     */
+    protected function unsetClauses()
+    {
+        $this->wheres = [];
+        $this->whereIns = [];
+        $this->scopes = [];
+        $this->take = null;
+
+        return $this;
+    }
+
+    /**
      * Count the number of specified model records in the database.
      *
      * @return int
@@ -92,25 +139,9 @@ abstract class BaseRepository implements RepositoryContract
     }
 
     /**
-     * Get the first specified model record from the database.
-     *
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function first()
-    {
-        $this->newQuery()->eagerLoad()->setClauses()->setScopes();
-
-        $model = $this->query->firstOrFail();
-
-        $this->unsetClauses();
-
-        return $model;
-    }
-
-    /**
      * Get all the specified model records in the database.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function get()
     {
@@ -124,27 +155,67 @@ abstract class BaseRepository implements RepositoryContract
     }
 
     /**
-     * Get the specified model record from the database.
+     * Set query scopes.
      *
-     * @param $id
-     *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return $this
      */
-    public function getById($id)
+    protected function setScopes()
     {
-        $this->unsetClauses();
+        foreach ($this->scopes as $method => $args) {
+            $this->query->$method(implode(', ', $args));
+        }
 
-        $this->newQuery()->eagerLoad();
-
-        return $this->query->findOrFail($id);
+        return $this;
     }
 
     /**
-     * @param $item
-     * @param $column
+     * Set clauses on the query builder.
+     *
+     * @return $this
+     */
+    protected function setClauses()
+    {
+        foreach ($this->wheres as $where) {
+            $this->query->where($where['column'], $where['operator'], $where['value']);
+        }
+
+        foreach ($this->whereIns as $whereIn) {
+            $this->query->whereIn($whereIn['column'], $whereIn['values']);
+        }
+
+        foreach ($this->orderBys as $orders) {
+            $this->query->orderBy($orders['column'], $orders['direction']);
+        }
+
+        if (isset($this->take) and !is_null($this->take)) {
+            $this->query->take($this->take);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get the first specified model record from the database.
+     *
+     * @return Model
+     */
+    public function first()
+    {
+        $this->newQuery()->eagerLoad()->setClauses()->setScopes();
+
+        $model = $this->query->firstOrFail();
+
+        $this->unsetClauses();
+
+        return $model;
+    }
+
+    /**
+     * @param         $item
+     * @param         $column
      * @param  array  $columns
      *
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     * @return Builder|Model|object|null
      */
     public function getByColumn($item, $column, array $columns = ['*'])
     {
@@ -161,7 +232,7 @@ abstract class BaseRepository implements RepositoryContract
      * @param $id
      *
      * @return bool|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function deleteById($id)
     {
@@ -171,9 +242,25 @@ abstract class BaseRepository implements RepositoryContract
     }
 
     /**
+     * Get the specified model record from the database.
+     *
+     * @param $id
+     *
+     * @return Model
+     */
+    public function getById($id)
+    {
+        $this->unsetClauses();
+
+        $this->newQuery()->eagerLoad();
+
+        return $this->query->findOrFail($id);
+    }
+
+    /**
      * Set the query limit.
      *
-     * @param int $limit
+     * @param  int  $limit
      *
      * @return $this
      */
@@ -187,8 +274,8 @@ abstract class BaseRepository implements RepositoryContract
     /**
      * Set an ORDER BY clause.
      *
-     * @param string $column
-     * @param string $direction
+     * @param  string  $column
+     * @param  string  $direction
      * @return $this
      */
     public function orderBy($column, $direction = 'asc')
@@ -199,12 +286,12 @@ abstract class BaseRepository implements RepositoryContract
     }
 
     /**
-     * @param int    $limit
-     * @param array  $columns
-     * @param string $pageName
-     * @param null   $page
+     * @param  int     $limit
+     * @param  array   $columns
+     * @param  string  $pageName
+     * @param  null    $page
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
     public function paginate($limit = 25, array $columns = ['*'], $pageName = 'page', $page = null)
     {
@@ -220,9 +307,9 @@ abstract class BaseRepository implements RepositoryContract
     /**
      * Add a simple where clause to the query.
      *
-     * @param string $column
-     * @param string $value
-     * @param string $operator
+     * @param  string  $column
+     * @param  string  $value
+     * @param  string  $operator
      *
      * @return $this
      */
@@ -236,8 +323,8 @@ abstract class BaseRepository implements RepositoryContract
     /**
      * Add a simple where in clause to the query.
      *
-     * @param string $column
-     * @param mixed  $values
+     * @param  string  $column
+     * @param  mixed   $values
      *
      * @return $this
      */
@@ -264,87 +351,6 @@ abstract class BaseRepository implements RepositoryContract
         }
 
         $this->with = $relations;
-
-        return $this;
-    }
-
-    /**
-     * Create a new instance of the model's query builder.
-     *
-     * @return $this
-     */
-    protected function newQuery()
-    {
-        $this->query = $this->model->newQuery();
-
-        return $this;
-    }
-
-    /**
-     * Add relationships to the query builder to eager load.
-     *
-     * @return $this
-     */
-    protected function eagerLoad()
-    {
-        foreach ($this->with as $relation) {
-            $this->query->with($relation);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Set clauses on the query builder.
-     *
-     * @return $this
-     */
-    protected function setClauses()
-    {
-        foreach ($this->wheres as $where) {
-            $this->query->where($where['column'], $where['operator'], $where['value']);
-        }
-
-        foreach ($this->whereIns as $whereIn) {
-            $this->query->whereIn($whereIn['column'], $whereIn['values']);
-        }
-
-        foreach ($this->orderBys as $orders) {
-            $this->query->orderBy($orders['column'], $orders['direction']);
-        }
-
-        if (isset($this->take) and ! is_null($this->take)) {
-            $this->query->take($this->take);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Set query scopes.
-     *
-     * @return $this
-     */
-    protected function setScopes()
-    {
-        foreach ($this->scopes as $method => $args) {
-            $this->query->$method(implode(', ', $args));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Reset the query clause parameter arrays.
-     *
-     * @return $this
-     */
-    protected function unsetClauses()
-    {
-        $this->wheres = [];
-        $this->whereIns = [];
-        $this->scopes = [];
-        $this->take = null;
 
         return $this;
     }

@@ -3,6 +3,11 @@
 namespace App\Listeners;
 
 
+use App\Events\Todo\TodoCompleted;
+use App\Events\Todo\TodoCreated;
+use App\Events\Todo\TodoDeleted;
+use App\Events\Todo\TodoReactivated;
+use App\Events\Todo\TodoUpdated;
 use Illuminate\Events\Dispatcher;
 use Log;
 
@@ -42,27 +47,27 @@ class TodoEventListener
     public function subscribe($events)
     {
         $events->listen(
-            \App\Events\Todo\TodoCreated::class,
+            TodoCreated::class,
             'App\Listeners\TodoEventListener@onCreated'
         );
 
         $events->listen(
-            \App\Events\Todo\TodoUpdated::class,
+            TodoUpdated::class,
             'App\Listeners\TodoEventListener@onUpdated'
         );
 
         $events->listen(
-            \App\Events\Todo\TodoDeleted::class,
+            TodoDeleted::class,
             'App\Listeners\TodoEventListener@onDeleted'
         );
 
         $events->listen(
-            \App\Events\Todo\TodoCompleted::class,
+            TodoCompleted::class,
             'App\Listeners\TodoEventListener@onCompleted'
         );
 
         $events->listen(
-            \App\Events\Todo\TodoReactivated::class,
+            TodoReactivated::class,
             'App\Listeners\TodoEventListener@onReactivated'
         );
     }

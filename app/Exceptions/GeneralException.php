@@ -3,6 +3,9 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Throwable;
 
 /**
@@ -18,9 +21,9 @@ class GeneralException extends Exception
     /**
      * GeneralException constructor.
      *
-     * @param string         $message
-     * @param int            $code
-     * @param Throwable|null $previous
+     * @param  string          $message
+     * @param  int             $code
+     * @param  Throwable|null  $previous
      */
     public function __construct($message = '', $code = 0, Throwable $previous = null)
     {
@@ -38,12 +41,12 @@ class GeneralException extends Exception
     /**
      * Render the exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @param  Request
+     * @return JsonResponse|Response
      */
     public function render($request)
     {
-        if($request->isJson() || $request->expectsJson()){
+        if ($request->isJson() || $request->expectsJson()) {
             return response()->json($this->message);
         }
         // All instances of GeneralException redirect back with a flash message to show a bootstrap alert-error

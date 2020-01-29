@@ -14,37 +14,37 @@
                             <span><i class="arrow down"></i></span>
                         </div>
                         <div class="col-11 pl-0">
-                            <input type="text" v-model="newTodo.todo" @keyup.enter.prevent="addNewTodo"
-                                   class="w-100 no-border todo-input" placeholder="Whats need to be done?"/>
+                            <input @keyup.enter.prevent="addNewTodo" class="w-100 no-border todo-input" placeholder="Whats need to be done?"
+                                   type="text" v-model="newTodo.todo"/>
                         </div>
                     </div>
 
                     <hr class="m-0 separator">
-                    <div v-if="filterTodos && filterTodos.length" class="mt-2">
-                        <div class="todo-list clearfix" v-for="(todo, index) of filterTodos" :key="todo.id">
+                    <div class="mt-2" v-if="filterTodos && filterTodos.length">
+                        <div :key="todo.id" class="todo-list clearfix" v-for="(todo, index) of filterTodos">
                             <div @mouseenter="currentTodo = index"
                                  @mouseleave="currentTodo = null">
 
                                 <div class="icheck-success d-inline">
-                                    <input v-show="filterTodos.actions" type="radio" :id="'todo'+todo.id"
-                                           @click="completeTodo(todo.id)" :checked="todo.completed"/>
+                                    <input :checked="todo.completed" :id="'todo'+todo.id" @click="completeTodo(todo.id)"
+                                           type="radio" v-show="filterTodos.actions"/>
                                     <label :for="'todo'+todo.id"></label>
                                 </div>
 
                                 <input
-                                    v-if="todo.update && !todo.completed"
-                                    v-model="todo.todo"
                                     @blur="todo.update = false; updateTodo(todo)"
                                     @keyup.enter="todo.update=false; updateTodo(todo)"
-                                    v-focus/>
+                                    v-focus
+                                    v-if="todo.update && !todo.completed"
+                                    v-model="todo.todo"/>
 
-                                <label v-else @click="todo.update = true"
-                                       :class="todo.completed ? 'completed' : '' ">
+                                <label :class="todo.completed ? 'completed' : '' " @click="todo.update = true"
+                                       v-else>
                                     {{todo.todo}}
                                 </label>
 
-                                <a v-show="currentTodo === index" href="" class="float-right cancel"
-                                   @click.prevent="deleteTodo(todo)">x</a>
+                                <a @click.prevent="deleteTodo(todo)" class="float-right cancel" href=""
+                                   v-show="currentTodo === index">x</a>
                             </div>
                         </div>
 
@@ -57,12 +57,12 @@
                                 'item' }} left</a>
                         </div>
                         <div class="col-9">
-                            <a href="" @click.prevent="filterBy = 'all'" :class="filterBy === 'all' ? 'active' : '' ">All</a>
-                            <a href="" @click.prevent="filterBy = 'active'"
-                               :class="filterBy === 'active' ? 'active' : '' ">Active</a>
-                            <a href="#" @click.prevent="filterBy = 'complete'"
-                               :class="filterBy === 'complete' ? 'active' : '' ">Completed</a>
-                            <a href="#" @click.prevent="clearCompleted()" v-show="completedTodosCount > 0">Clear
+                            <a :class="filterBy === 'all' ? 'active' : '' " @click.prevent="filterBy = 'all'" href="">All</a>
+                            <a :class="filterBy === 'active' ? 'active' : '' " @click.prevent="filterBy = 'active'"
+                               href="">Active</a>
+                            <a :class="filterBy === 'complete' ? 'active' : '' " @click.prevent="filterBy = 'complete'"
+                               href="#">Completed</a>
+                            <a @click.prevent="clearCompleted()" href="#" v-show="completedTodosCount > 0">Clear
                                 Completed</a>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
         data: function () {
             return {
                 filterBy: 'all',
-                currentTodo : null,
+                currentTodo: null,
             }
         },
         methods: {

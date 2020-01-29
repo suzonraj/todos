@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\TodoController;
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +18,9 @@ use Illuminate\Http\Request;
 //});
 //
 
-Route::get('todos', [TodoController::class,'index']);
-Route::post('todos', [TodoController::class,'store']);
-Route::patch('todos/{todo}', [TodoController::class,'update']);
-Route::delete('todos/{todo}', [TodoController::class,'destroy']);
-Route::patch('todos/{todo}/complete', [TodoController::class,'complete']);
+Route::get('todos', [TodoController::class, 'index']);
+Route::post('todos', [TodoController::class, 'store']);
+Route::patch('todos/{todo}', [TodoController::class, 'update']);
+Route::delete('todos/{todo}', [TodoController::class, 'destroy']);
+Route::patch('todos/{todo}/complete', [TodoController::class, 'complete']);
 Route::post('todos/clear-completed', [TodoController::class, 'clearCompleted']);
