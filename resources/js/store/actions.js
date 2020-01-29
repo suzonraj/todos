@@ -19,11 +19,10 @@ let actions = {
             });
     },
     ADD_TODO({commit}) {
-
         axios.post(this.state.apiUrl + '/todos', {
             body: this.state.newTodo.todo
         }).then(res => {
-            let todo = this.state.newTodo;
+            let todo = res.data.data;
             commit('ADD_TODO', {
                 id: todo.id,
                 todo: todo.todo,
